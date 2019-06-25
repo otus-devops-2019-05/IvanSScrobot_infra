@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mydir=~/git
+mydir=~/
 
 if [ -d $mydir ]
 then
