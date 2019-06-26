@@ -1,4 +1,5 @@
 #!/bin/bash
+
 mydir=~/git
 
 if [ -d $mydir ]
