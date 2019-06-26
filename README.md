@@ -16,7 +16,7 @@ Following scripts were successfully  created and tested:
 **3.Additional task 1: a startup script **
 A new GC virtual machine with the test app can be started with the following command:
 
-gcloud compute instances create reddit-app-01\
+gcloud compute instances create reddit-app\
   --boot-disk-size=10GB \
   --image-family ubuntu-1604-lts \
   --image-project=ubuntu-os-cloud \
