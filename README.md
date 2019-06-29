@@ -1,5 +1,5 @@
-vanSScrobot_infra
-IvanSScrobot Infra repository
+
+# IvanSScrobot_infra 
 
 ## HW2 ChatOPS
 
@@ -22,10 +22,10 @@ gem install travis
 Then, authorize and encrypt the password:
 ```
 travis login --com
-travis encrypt "<команда>:<токен>#<имя_канала>" --add notifications.slack.rooms --com
+travis encrypt "<ÐºÐ¾Ð¼Ð°Ð½Ð´Ð°>:<Ñ‚Ð¾ÐºÐµÐ½>#<Ð¸Ð¼Ñ_ÐºÐ°Ð½Ð°Ð»Ð°>" --add notifications.slack.rooms --com
 ```
  
-## HW#3 First step into cloud unfrasrtucture and services
+## HW#3 First steps into cloud unfrasrtucture and services
 
 **0. Preparation:**
 
@@ -45,7 +45,7 @@ Then, create two VM:
 ```
 gcloud compute instances create bastion --image-project ubuntu-os-cloud --image-family ubuntu-1604-lts  --zone us-central1-c --preemptible --machine-type f1-micro
 gcloud compute instances create someinternalhost --image-project ubuntu-os-cloud --image-family ubuntu-1604-lts  --zone us-central1-c --preemptible --machine-type f1-micro --no-address
-...
+```
 
 Open http, https: `gcloud compute instances add-tags bastion --tags http-server,https-server --zone us-central1-c `
 
@@ -59,7 +59,7 @@ someinternalhost_IP = 10.128.0.2
 
 **2. Now. it's possible to reach someinternalhost with only one command:**
 
-`ssh -A -t ivan@34.77.163.228 'ssh 10.128.0.2'`
+`ssh -A -t ivan@34.77.163.228 'ssh 10.128.0.2 '`
 
 
 **3. We need to make a direct connection through the command "SSH someinternalhost"**
@@ -95,8 +95,8 @@ gcloud compute instance add-tags bastion --zone us-central1-c --tags pritunl
 The final step - ncryption for Pritunl with sslip.io
 
 
-## HW#4�Main services of Google Cloud Platform (GCP).
- Test application deploy
+## HW#4 Main services of Google Cloud Platform (GCP).
+### Test application deploy
 
 
 **1. Configuration:**
