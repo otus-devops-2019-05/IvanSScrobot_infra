@@ -37,6 +37,7 @@ gcloud init
 gcloud projects create infra
 gcloud config set project infra
 ```
+For more info, [RTFM](https://cloud.google.com/sdk/docs/)
 
 Generate a ssh key: `ssh-keygen -t rsa -f ~/.ssh/gcloud-iowa-key1 -C gcloud-test-usr
 Add the ssh key into agent: `ssh-add ~/.ssh/gcloud-name`
@@ -99,6 +100,42 @@ The final step - ncryption for Pritunl with sslip.io
 ## HW#4 Main services of Google Cloud Platform (GCP).
 ### Test application deploy
 
+**0. Preparation:**
+Create a new VM:
+```
+gcloud compute instances create reddit-app\
+  --boot-disk-size=10GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure
+  ```
+ 
+ Install Ruby and bundler:
+ ```
+sudo apt update
+sudo apt install -y ruby-full ruby-bundler build-essential
+```
+
+Install and run MongoDB:
+```
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+sudo bash -c 'echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list'
+sudo apt update
+sudo apt install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
+```
+
+Then, deploy our test app:
+```
+git clone -b monolith https://github.com/express42/reddit.git
+cd reddit && bundle install
+puma -d
+```
+Open port 9292 in the firewall.
+
 
 **1. Configuration:**
 
@@ -108,13 +145,16 @@ testapp_port = 9292
 
 **2.  Independent practice 1:**
 
-Following scripts were successfully created and tested:
+Following scripts were created and tested:
  - install_ruby.sh for automated installation of Ruby
  - install_mongodb.sh for automated installation of MongoDB
  - deploy.sh for automated downloading and installation the test application (with dependancies with the help of bundler)
 
+Basically, they are consists of the simple commands from the step 0.
+
 **Important!!** All .sh files must have permission to execute them. If a file is committed in git without "x" permission, use command `git update-index --chmod=+x 'name-of-shell-script'`
 To check file permissions in git, use `git ls-files --stage`
+Changing permissions with `chmod` doesn't work for git.
 
 **3.  Additional task 1: a startup script** 
 
@@ -129,7 +169,7 @@ gcloud compute instances create reddit-app\
   --restart-on-failure \
   --metadata-from-file startup-script=install.sh
 
-Note: install.sh has to be placed in the current dir, or write the entire path to the script. 
+Note: install.sh has to be placed in the current dir, or you have to write the entire path to the script. 
 
 **4.  Additional task 2: create the firewall rule:**
 
