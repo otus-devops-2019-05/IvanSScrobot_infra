@@ -102,6 +102,7 @@ The final step - ncryption for Pritunl with sslip.io
 **1. Configuration:**
 
 testapp_IP = 104.198.251.218
+
 testapp_port = 9292
 
 **2.  Independent practice 1:**
