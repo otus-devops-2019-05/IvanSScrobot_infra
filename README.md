@@ -22,7 +22,7 @@ gem install travis
 Then, authorize and encrypt the password:
 ```
 travis login --com
-travis encrypt "<ÐºÐ¾Ð¼Ð°Ð½Ð´Ð°>:<Ñ‚Ð¾ÐºÐµÐ½>#<Ð¸Ð¼Ñ_ÐºÐ°Ð½Ð°Ð»Ð°>" --add notifications.slack.rooms --com
+travis encrypt "devops-team-otus:<my_token>#<name_of_my_chanel>" --add notifications.slack.rooms --com
 ```
  
 ## HW#3 First steps into cloud unfrasrtucture and services
@@ -83,6 +83,7 @@ ProxyCommand ssh bastion nc %h %p
 **Important!** Only the owner of the file must have rights for writing. Use `chmod go-w ~/.ssh/config`
 
 **4. VPN:**
+
 [Install Pritunl](https://docs.pritunl.com/docs/installation#section-linux-repositories)
 
 
