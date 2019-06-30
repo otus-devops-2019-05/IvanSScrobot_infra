@@ -178,3 +178,52 @@ gcloud compute firewall-rules create default-puma-server1 --allow tcp:9292 \
 
 gcloud [documentation](https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create)
 
+## HW#5 Build automated machine images with [packer](https://www.packer.io/).
+
+**0. Preparation:**
+Download and [install](https://www.packer.io/intro/getting-started/install.html) packer:
+
+```
+cd /usr/local/src
+sudo curl -O https://releases.hashicorp.com/packer/1.4.2/packer_1.4.2_linux_amd64.zip 
+sudo yum install unzip
+sudo unzip packer_1.4.2_linux_amd64.zip
+sudo rm -f packer_1.4.2_linux_amd64.zip
+sudo mv /usr/local/bin/packer /usr/sbin/
+```
+
+Create ADC ( [doc](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login) ):
+`gcloud auth application-default login`
+(Credentials saved to file: /home/ivan/.config/gcloud/application_default_credentials.json)
+
+Create packer template in the file ubuntu16.json ([gist](https://raw.githubusercontent.com/express42/otus-snippets/master/packer-base/ubuntu16-03-mongo.json ) ).
+
+Check the template: `packer validate ./ubuntu16.json`. For more info, see [docs](https://www.packer.io/docs/templates/index.html)
+For deleting 'sudo ' from scripts, in vi editor use `:g/sudo /s///g`
+
+
+Build a new image: `packer build ubuntu16.json`
+
+**1.  Independent practice 1:**
+
+
+In ubuntu16.json, add "variables" section (see [docs](https://www.packer.io/docs/templates/user-variables.html) ):
+```
+"variables":
+    {
+      "gc_project_id": "",
+      "gc_source_image_family": "",
+      "gc_machine_type": "f1-micro",
+      "gc_disk_size": "10",
+      "gc_disk_type": "pd-standard",
+      "gc_image_description": "",
+      "gc_network": "default",
+      "gc_tags": "puma-server"
+    },
+```	
+
+Variables are set in the "variables.json" file. Now, I can bild a template with the command:
+`packer build -var-file=variables.json ubuntu16.json`.
+
+
+See docs for Google Compute Builder [here](https://www.packer.io/docs/builders/googlecompute.html#image_labels)
