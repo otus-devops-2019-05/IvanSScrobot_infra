@@ -176,7 +176,7 @@ Note: install.sh has to be placed in the current dir, or you have to write the e
 gcloud compute firewall-rules create default-puma-server1 --allow tcp:9292 \
 --source-ranges="0.0.0.0/0" --target-tags puma-server
 
-gcloud [documentation](https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create)
+gcloud [documentation here](https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create) and [here](https://cloud.google.com/vpc/docs/using-firewalls)
 
 ## HW#5 Build automated machine images with [packer](https://www.packer.io/).
 
