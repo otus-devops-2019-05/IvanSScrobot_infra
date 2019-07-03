@@ -1,4 +1,5 @@
 
+
 # IvanSScrobot_infra 
 
 ## HW2 ChatOPS
@@ -11,7 +12,7 @@ Install ruby, rubygems, gem "travis":
 gem install travis
 ```
 
-**!!Important:** in Centos 7, I had a problem: "ERROR: Failed to build gem native extension". In the end I was able to build travis-cli after installing these dependencies:
+**!!Important:** in Centos 7, I had a problem: "ERROR: Failed to build gem native extension". In the end, I was able to build travis-cli after installing these dependencies:
 - List item
  - ruby-dev
  - gcc
@@ -25,13 +26,13 @@ travis login --com
 travis encrypt "devops-team-otus:<my_token>#<name_of_my_chanel>" --add notifications.slack.rooms --com
 ```
  
-## HW#3 First steps into cloud unfrasrtucture and services
+## HW#3 First steps into cloud infrastructure and services
 
 **0. Preparation:**
 
 [Install gcloud command-line interface](https://cloud.google.com/sdk/docs/downloads-interactive#linux)
 
-Initilize a project:
+Initialize a project:
 ```
 gcloud init
 gcloud projects create infra
@@ -148,7 +149,7 @@ testapp_port = 9292
 Following scripts were created and tested:
  - install_ruby.sh for automated installation of Ruby
  - install_mongodb.sh for automated installation of MongoDB
- - deploy.sh for automated downloading and installation the test application (with dependancies with the help of bundler)
+ - deploy.sh for automated downloading and installation the test application (with dependencies with the help of bundler)
 
 Basically, they are consists of the simple commands from the step 0.
 
@@ -204,10 +205,10 @@ For deleting 'sudo ' from scripts, in vi editor use `:g/sudo /s///g`
 
 Build a new image: `packer build ubuntu16.json`
 
-**1.  Independent practice 1:**
+**1.  Independent practice:**
 
 
-In ubuntu16.json, add "variables" section (see [docs](https://www.packer.io/docs/templates/user-variables.html) ):
+In order to make ubuntu16.json parametrized, add "variables" section in the file (see [docs](https://www.packer.io/docs/templates/user-variables.html) ):
 ```
 "variables":
     {
@@ -222,8 +223,26 @@ In ubuntu16.json, add "variables" section (see [docs](https://www.packer.io/docs
     },
 ```	
 
-Variables are set in the "variables.json" file. Now, I can bild a template with the command:
+Variables are set in the "variables.json" file. Now, I can build a template with the command:
 `packer build -var-file=variables.json ubuntu16.json`.
 
 
 See docs for Google Compute Builder [here](https://www.packer.io/docs/builders/googlecompute.html#image_labels)
+
+
+**2. Additional tasks with \*:**
+
+"Bake" a VM image with all necessary dependencies and systemd unit for puma server. Description of the systemd.md file for puma see [here](https://github.com/puma/puma/blob/master/docs/systemd.md).  Info about systemd for newbies see [here](https://habr.com/ru/company/southbridge/blog/255845/). 
+
+Sometimes, GCE couldn't build an image and failed with the error:
+  `==> googlecompute: E: Could not get lock /var/lib/dpkg/lock-frontend - open (11: Resource temporarily unavailable)`.
+ It seems that changing zones for a new VM helped to fix the problem: ` packer build -var-file=variables.json -var "gc_image_description=image_for_puma_app" -var "gc_machine_type=g1-small" -var "gc_zone=us-central1-b" immutable.json `.
+
+The baked, fully prepared VM can be created with the command 
+```
+gcloud compute instances create reddit-full-app01 --image-family reddit-full \
+--zone europe-west1-b \
+--tags puma-server \
+--boot-disk-size=10GB \
+--restart-on-failure
+```
