@@ -1,4 +1,5 @@
 
+
 # IvanSScrobot_infra 
 
 ## HW2 ChatOPS
@@ -11,7 +12,7 @@ Install ruby, rubygems, gem "travis":
 gem install travis
 ```
 
-**!!Important:** in Centos 7, I had a problem: "ERROR: Failed to build gem native extension". In the end I was able to build travis-cli after installing these dependencies:
+**!!Important:** in Centos 7, I had a problem: "ERROR: Failed to build gem native extension". In the end, I was able to build travis-cli after installing these dependencies:
 - List item
  - ruby-dev
  - gcc
@@ -25,13 +26,13 @@ travis login --com
 travis encrypt "devops-team-otus:<my_token>#<name_of_my_chanel>" --add notifications.slack.rooms --com
 ```
  
-## HW#3 First steps into cloud unfrasrtucture and services
+## HW#3 First steps into cloud infrastructure and services
 
 **0. Preparation:**
 
 [Install gcloud command-line interface](https://cloud.google.com/sdk/docs/downloads-interactive#linux)
 
-Initilize a project:
+Initialize a project:
 ```
 gcloud init
 gcloud projects create infra
@@ -148,7 +149,7 @@ testapp_port = 9292
 Following scripts were created and tested:
  - install_ruby.sh for automated installation of Ruby
  - install_mongodb.sh for automated installation of MongoDB
- - deploy.sh for automated downloading and installation the test application (with dependancies with the help of bundler)
+ - deploy.sh for automated downloading and installation the test application (with dependencies with the help of bundler)
 
 Basically, they are consists of the simple commands from the step 0.
 
@@ -176,5 +177,72 @@ Note: install.sh has to be placed in the current dir, or you have to write the e
 gcloud compute firewall-rules create default-puma-server1 --allow tcp:9292 \
 --source-ranges="0.0.0.0/0" --target-tags puma-server
 
-gcloud [documentation](https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create)
+gcloud [documentation here](https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create) and [here](https://cloud.google.com/vpc/docs/using-firewalls)
 
+## HW#5 Build automated machine images with [packer](https://www.packer.io/).
+
+**0. Preparation:**
+Download and [install](https://www.packer.io/intro/getting-started/install.html) packer:
+
+```
+cd /usr/local/src
+sudo curl -O https://releases.hashicorp.com/packer/1.4.2/packer_1.4.2_linux_amd64.zip 
+sudo yum install unzip
+sudo unzip packer_1.4.2_linux_amd64.zip
+sudo rm -f packer_1.4.2_linux_amd64.zip
+sudo mv /usr/local/bin/packer /usr/sbin/
+```
+
+Create ADC ( [doc](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login) ):
+`gcloud auth application-default login`
+(Credentials saved to file: /home/ivan/.config/gcloud/application_default_credentials.json)
+
+Create packer template in the file ubuntu16.json ([gist](https://raw.githubusercontent.com/express42/otus-snippets/master/packer-base/ubuntu16-03-mongo.json ) ).
+
+Check the template: `packer validate ./ubuntu16.json`. For more info, see [docs](https://www.packer.io/docs/templates/index.html)
+For deleting 'sudo ' from scripts, in vi editor use `:g/sudo /s///g`
+
+
+Build a new image: `packer build ubuntu16.json`
+
+**1.  Independent practice:**
+
+
+In order to make ubuntu16.json parametrized, add "variables" section in the file (see [docs](https://www.packer.io/docs/templates/user-variables.html) ):
+```
+"variables":
+    {
+      "gc_project_id": "",
+      "gc_source_image_family": "",
+      "gc_machine_type": "f1-micro",
+      "gc_disk_size": "10",
+      "gc_disk_type": "pd-standard",
+      "gc_image_description": "",
+      "gc_network": "default",
+      "gc_tags": "puma-server"
+    },
+```	
+
+Variables are set in the "variables.json" file. Now, I can build a template with the command:
+`packer build -var-file=variables.json ubuntu16.json`.
+
+
+See docs for Google Compute Builder [here](https://www.packer.io/docs/builders/googlecompute.html#image_labels)
+
+
+**2. Additional tasks with \*:**
+
+"Bake" a VM image with all necessary dependencies and systemd unit for puma server. Description of the systemd.md file for puma see [here](https://github.com/puma/puma/blob/master/docs/systemd.md).  Info about systemd for newbies see [here](https://habr.com/ru/company/southbridge/blog/255845/). 
+
+Sometimes, GCE couldn't build an image and failed with the error:
+  `==> googlecompute: E: Could not get lock /var/lib/dpkg/lock-frontend - open (11: Resource temporarily unavailable)`.
+ It seems that changing zones for a new VM helped to fix the problem: ` packer build -var-file=variables.json -var "gc_image_description=image_for_puma_app" -var "gc_machine_type=g1-small" -var "gc_zone=us-central1-b" immutable.json `.
+
+The baked, fully prepared VM can be created with the command 
+```
+gcloud compute instances create reddit-full-app01 --image-family reddit-full \
+--zone europe-west1-b \
+--tags puma-server \
+--boot-disk-size=10GB \
+--restart-on-failure
+```
