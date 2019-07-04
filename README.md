@@ -2,7 +2,7 @@
 
 # IvanSScrobot_infra 
 
-## HW2 ChatOPS
+## HW#2 ChatOPS
 
 [Integrate Slack with GitHub](https://get.slack.help/hc/en-us/articles/232289568-GitHub-for-Slack)
 
@@ -238,7 +238,7 @@ Sometimes, GCE couldn't build an image and failed with the error:
   `==> googlecompute: E: Could not get lock /var/lib/dpkg/lock-frontend - open (11: Resource temporarily unavailable)`.
  It seems that changing zones for a new VM helped to fix the problem: ` packer build -var-file=variables.json -var "gc_image_description=image_for_puma_app" -var "gc_machine_type=g1-small" -var "gc_zone=us-central1-b" immutable.json `.
 
-The baked, fully prepared VM can be created with the command 
+The baked, fully prepared VM can be created with the command: 
 ```
 gcloud compute instances create reddit-full-app01 --image-family reddit-full \
 --zone europe-west1-b \
