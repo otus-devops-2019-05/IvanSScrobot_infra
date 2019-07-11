@@ -246,3 +246,95 @@ gcloud compute instances create reddit-full-app01 --image-family reddit-full \
 --boot-disk-size=10GB \
 --restart-on-failure
 ```
+
+## HW#6 Terraform. Practice IaC.
+
+**0. Preparation:**
+Download [terraform](https://releases.hashicorp.com/terraform/0.12.3/terraform_0.12.3_linux_amd64.zip) (note - for this practise we need version 0.11.11), copy file 'terraform' from the archive in $PATH.
+
+In main.tf define provider "google", then run `terraform init`. Then define resource (instance), ssh for this instance, firewall rule, tag for the instance, etc. (see [docs](https://www.terraform.io/docs/providers/google/index.html)). Add provisioners for copying file for our puma systemctl service and run deploy.sh (without manually copying the file to the instance). Define connection for provisioners. Run `terraform plan`, `terraform apply`, `terraform taint`, `terraform destroy`. 
+
+In outputs.tf define output variables, in variables.tf input variables (values of variables in terraform.tfvars).
+
+**1.  Independent practice:**
+
+Define input variables for my private key, VM zone:
+```
+variable public_key_path {
+       description = "Path to the public key used for ssh access"
+        }
+variable zone {
+       description = "Region"
+       default = "europe-west1-b"
+        }
+```
+Format files with the command `terraform fmt`.
+
+**2. Additional tasks with \*:**
+Add ssh keys in GCE project metadata and delete sshKeys from the instance description:
+
+```
+resource "google_compute_project_metadata_item" "default" {
+ key = "ssh-keys"
+ value = "ivan:${file(var.public_key_path)} \nivan2:${file(var.public_key_path)}"
+ project = "${var.project}"
+}
+```
+
+If some other ssh keys are added in the project manually (e.g. through web GUI), terraform erases it when `apply` is run.
+
+**3. Additional tasks with \**:**
+
+First, I created a load balancer manually:
+- Create an instance group:
+```
+gcloud compute --project=my-project-name instance-groups unmanaged create puma-instance-group --zone=europe-west1-b
+
+gcloud compute --project=my-project-name instance-groups unmanaged add-instances puma-instance-group --zone=europe-west1-b --instances=reddit-app
+
+gcloud compute instance-groups unmanaged set-named-ports puma-instance-group \
+   --named-ports http:9292 \
+   --zone europe-west1-b
+```
+- Create load balance (along with backend service and health check):
+```
+gcloud compute health-checks create http puma-health-check --port 9292
+    
+gcloud compute backend-services create puma-backend-service \
+   --protocol HTTP \
+   --health-checks puma-health-check \
+   --global
+    
+gcloud compute backend-services add-backend puma-backend-service \
+   --balancing-mode UTILIZATION \
+   --max-utilization 0.8 \
+   --capacity-scaler 1 \
+   --instance-group puma-instance-group \
+   --instance-group-zone europe-west1-b \
+   --global
+
+gcloud compute url-maps create puma-balancer \
+   --default-service puma-backend-service
+
+gcloud compute target-http-proxies create http-lb-proxy \
+   --url-map puma-balancer
+    
+    
+gcloud compute forwarding-rules create http-content-rule \
+   --global \
+   --target-http-proxy http-lb-proxy \
+   --ports 80   
+```
+Then with the help of [documentation](https://www.terraform.io/docs/providers/google/r/compute_instance_group.html), I described load balancer configuration in the file lb.tf. Also, I added variable `node_count` to manage number of instances behind the balancer. This variable is used for creating instances:
+```
+resource "google_compute_instance" "app" {
+ count        = "${var.node_count}"
+ name         = "app${count.index}"
+```
+In this case, number of instances is equal `node_var`, and this array of instances can be used with the sintax: `instances = ["${google_compute_instance.app.*.self_link}"]`. Terraform makes something similar a `for each`, in other words, identifies each instance within the array and return self_links of an actual instance.
+
+!Problems with this configuration:
+- load balancer only redirects traffic to instances and doesn't save sessions. As a result, information about logging isn't kept, and it's not possible to write a message in our mock guest book.
+- data between instances is not synchronized, so balancer randomly returns pages with different posts (if we make some posts directly on the instances bypassing the balancer).
+
+
