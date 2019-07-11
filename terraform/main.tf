@@ -1,11 +1,11 @@
 # count        = "${var.node_count}"
 
 terraform {
-  required_version = "0.11.11"
+  required_version = ">=0.11.11"
 }
 
 provider "google" {
-  version = "2.0.0"
+  version = "~> 2.5"
   project = "${var.project}"
   region  = "${var.region}"
 }
