@@ -1,7 +1,3 @@
-# Terraform Version
-terraform {
-  required_version = ">=0.11.11"
-}
 
 resource "google_compute_instance_group" "instance-groups" {
   name      = "instance-group1"
