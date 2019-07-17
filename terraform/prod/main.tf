@@ -14,7 +14,7 @@ module "app" {
   zone              = "${var.zone}"
   app_disk_image    = "${var.app_disk_image}"
   project           = "quick-cogency-244209"
-  private_key_path  = "~/.ssh/ivan"
+  private_key_path  = "${var.private_key_path}"
   app_instance_name = "${var.app_name}"
   db_external_ip    = "${join(",",module.db.db_external_ip)}"
 
