@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=appuser
 WorkingDirectory=/home/ivan/reddit
-Environment=DATABASE_URL="${database_url}"
+Environment=DATABASE_URL=${database_url}
 ExecStart=/bin/bash -lc 'puma'
 Restart=always
 RestartSec=10
