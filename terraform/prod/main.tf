@@ -1,5 +1,5 @@
 terraform {
-#  required_version = "~>0.11.7"
+  #  required_version = "~>0.11.7"
 }
 
 provider "google" {
@@ -9,14 +9,15 @@ provider "google" {
 }
 
 module "app" {
-  source           = "../modules/app"
-  public_key_path  = "${var.public_key_path}"
-  zone             = "${var.zone}"
-  app_disk_image   = "${var.app_disk_image}"
-  project          = "quick-cogency-244209"
-  private_key_path = "~/.ssh/ivan"
+  source            = "../modules/app"
+  public_key_path   = "${var.public_key_path}"
+  zone              = "${var.zone}"
+  app_disk_image    = "${var.app_disk_image}"
+  project           = "quick-cogency-244209"
+  private_key_path  = "~/.ssh/ivan"
   app_instance_name = "${var.app_name}"
-  db_external_ip    = "${join(",",module.db.db_external_ip)}" 
+  db_external_ip    = "${join(",",module.db.db_external_ip)}"
+
   # "${module.db.db_external_ip}"
 }
 

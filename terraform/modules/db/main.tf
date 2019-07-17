@@ -19,7 +19,7 @@ resource "google_compute_instance" "db" {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
 
-connection {
+  connection {
     type        = "ssh"
     user        = "ivan"
     agent       = false
@@ -30,13 +30,13 @@ connection {
     source      = "${path.module}/files/mongod.conf"
     destination = "/tmp/mongod.conf"
   }
-	
-provisioner "remote-exec" {
+
+  provisioner "remote-exec" {
     inline = [
       "sudo systemctl stop mongod",
       "sudo mv /etc/mongod.conf /etc/mongod.conf.old",
       "sudo cp /tmp/mongod.conf /etc/mongod.conf",
-      "sudo systemctl start mongod "
+      "sudo systemctl start mongod ",
     ]
- }
+  }
 }

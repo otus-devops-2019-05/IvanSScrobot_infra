@@ -1,0 +1,6 @@
+
+project= "quick-cgenc-12456"
+public_key_path = "~/.ssh/appuser.pub"
+private_key_path = "~/.ssh/appuser"
+disk_image = "reddit-base" ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMymuqKCuRs0ClvSbbIlE00XNOfNWtYlqjpsZYqZofnPLDkz3msX0/L7plf9397OJhEoiF9o3BzJg3IZ8KqsOoc=
+
