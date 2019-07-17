@@ -2,4 +2,4 @@ project= "quick-cgenc-12456"
 public_key_path = "~/.ssh/appuser.pub"
 private_key_path = "~/.ssh/appuser"
 disk_image = "reddit-base" 
-
+app_name = "app_name_prod"
