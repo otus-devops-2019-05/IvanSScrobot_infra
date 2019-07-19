@@ -1,4 +1,3 @@
-
 resource "google_compute_instance_group" "instance-groups" {
   name      = "instance-group1"
   zone      = "${var.zone}"

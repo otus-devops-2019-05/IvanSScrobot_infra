@@ -338,3 +338,81 @@ In this case, number of instances is equal `node_var`, and this array of instanc
 - data between instances is not synchronized, so balancer randomly returns pages with different posts (if we make some posts directly on the instances bypassing the balancer).
 
 
+## HW#7 Terraform. Practice #2.
+
+**0. Preparation:**
+
+Firstly, create in terraform a firewall rule that allows ssh access to my virtual services. Then import already existed in GCE firewall rule into Terraform. Then, created ip as a resource, and used this ip in virtual machines. 
+
+Secondly, make terraform configuration for two designated VM's - one for database server, and another for application server. With packer, two new images are made, then modules for terraform are created (DB module, APP module, and VPC one for network configuration). Output and input variables are used for more flexibility. 
+
+The modules are then used for separate "stage" and "prod" configurations.
+
+Don't forget `terraform get`, `terraform fmt`, and `tree .terraform` (in orger to check the current structure). 
+
+Finally, practise HashiCorp's  "registry": create backet with the help of [storage-bucket](https://registry.terraform.io/modules/SweetOps/storage-bucket/google).
+
+**1. Additional tasks with \*:**
+
+In backend.tf describe storaging of terraform "state" file. Use `prefix = prod` and  `prefix = stage` in order to store different state file in different folders within one backend.
+```
+terraform {
+  backend "gcs"
+    bucket = "storage-bucket-is"
+
+    prefix = "prod"
+
+}
+```
+
+**2. Additional tasks with \**:**
+
+Make my application work! For that, add provisioners for copying files and provisioner for running bash command:
+
+```
+ provisioner "file" {
+    content     = "${data.template_file.puma_file.rendered}"
+    destination = "/tmp/puma.service"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/files/deploy.sh"
+    destination = "/tmp/deploy.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cp /tmp/puma.service /etc/systemd/system/puma.service",
+      "sudo bash /tmp/deploy.sh",
+    ]
+  }
+  ```
+
+  In order to deliver real database VM server ip address to puma.service, I have to utilize template file (".tpl" extention):
+  ```
+  data "template_file" "puma_file" {
+  template = "${file("${path.module}/files/puma.service.tpl")}"
+
+  vars {
+    database_url = "${var.db_external_ip}:27017"
+  }
+}
+```
+That's because I must insert this line -  `Environment=DATABASE_URL=${database_url}` - in the middle of puma.conf file. Also, I had to tweak mongod.conf file (bindIp should be changed from 127.0.0.1 to 0.0.0.0), and I used provisioners as well (though I could have changed config with packer when I created the image):
+```
+ provisioner "file" {
+    source      = "${path.module}/files/mongod.conf"
+    destination = "/tmp/mongod.conf"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo systemctl stop mongod",
+      "sudo mv /etc/mongod.conf /etc/mongod.conf.old",
+      "sudo cp /tmp/mongod.conf /etc/mongod.conf",
+      "sudo systemctl start mongod ",
+    ]
+  }
+  ```
+
+  **Note:** the following script provides me with nice picture of infrastructure: `terraform graph -no-color | grep -v -e 'meta.count-boundary' -e 'provider.google\n(close)' | dot -T png >graph.png`
