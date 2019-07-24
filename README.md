@@ -286,6 +286,7 @@ Sometimes, GCE couldn't build an image and failed with the error:
  It seems that changing zones for a new VM helped to fix the problem: ` packer build -var-file=variables.json -var "gc_image_description=image_for_puma_app" -var "gc_machine_type=g1-small" -var "gc_zone=us-central1-b" immutable.json `.
 
 The baked, fully prepared VM can be created with the command 
+
 ```
 gcloud compute instances create reddit-full-app01 --image-family reddit-full \
 --zone europe-west1-b \
@@ -293,7 +294,6 @@ gcloud compute instances create reddit-full-app01 --image-family reddit-full \
 --boot-disk-size=10GB \
 --restart-on-failure
 ```
-
 
 ## HW#4 Main services of Google Cloud Platform (GCP).
 ### Test application deploy
@@ -470,4 +470,3 @@ Then, authorize and encrypt the password:
 travis login --com
 travis encrypt "devops-team-otus:<my_token>#<name_of_my_chanel>" --add notifications.slack.rooms --com
 ```
- 
