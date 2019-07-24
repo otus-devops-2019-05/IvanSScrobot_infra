@@ -4,7 +4,7 @@
 
 **0. Preparation:**
 
-First of all, install Ansible, see [officail doc](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html). Then, create  ansible.cfg file:
+First of all, install Ansible, see [official docs](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html). Then, create  ansible.cfg file:
 
 ```
 [defaults]
