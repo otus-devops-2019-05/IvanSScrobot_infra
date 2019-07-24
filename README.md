@@ -16,13 +16,13 @@ retry_files_enabled = False
 ```
 ... and create inventory file. Both .ini and .yml formats are supported (see [docs](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html)). Inventory file describes hosts wich can be managed by Ansible.
 
-Then, create a simple Ansible playbook in file 'clone.yml'. Run it with the command `ansible-playbook clone.yml`. After creating repo on the remote hosts, execute the same command again. Ansible return `ok=2    changed=0` as nothing is changed. Delete it: `ansible app -m command -a 'rm -rf ~/reddit'` and execute the playbook again. In that case, ansible show status `cahnged` again.
+Then, create a simple Ansible playbook in file 'clone.yml'. Run it with the command `ansible-playbook clone.yml`. After creating the repository on the remote hosts, execute the same command again. Ansible returns `ok=2    changed=0` as nothing is changed. Delete it: `ansible app -m command -a 'rm -rf ~/reddit'` and execute the playbook again. In that case, ansible show status `changed` again.
 
 **1. Additional tasks with \*:**
 
 Creatin dynamic inventory file in JSON format. Again, read the fucking [manual](https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html#intro-dynamic-inventory) or this excellent book ['Ansible for DevOps by Jeff Gerling'](https://www.ansible.com/resources/ebooks/ansible-for-devops).
 
-In a nutshell, script must output JSON to stdout, and Ansible must be able to call it with the argument --list. Ansible expects following JSON format:
+In a nutshell, the script must output JSON to stdout, and Ansible must be able to call it with the argument --list. Ansible expects the following JSON format:
 ```
 {
     "app": {
@@ -55,25 +55,25 @@ Section "_meta" is not mandatory and can be reduced to
 }
 ```
 
- There is an [example](https://github.com/geerlingguy/ansible-for-devops/tree/master/dynamic-inventory/custom) of Pyhon script creating dynamic inventory. I **did not** modify the script to work with Google Compute. In fact, my script just return statiс ip addresses instead of calling Google API and read something like `network_interface.0.access_config.0.nat_ip`. 
+ There is an [example](https://github.com/geerlingguy/ansible-for-devops/tree/master/dynamic-inventory/custom) of Python script creating dynamic inventory. I **did not** modify the script to work with Google Compute. In fact, my script just returns statiс IP addresses instead of calling Google API and read something like `network_interface.0.access_config.0.nat_ip`. 
  
  ## HW#7 Terraform. Practice #2.
 
 **0. Preparation:**
 
-Firstly, create in terraform a firewall rule that allows ssh access to my virtual services. Then import already existed in GCE firewall rule into Terraform. Then, created ip as a resource, and used this ip in virtual machines. 
+Firstly, create in terraform a firewall rule that allows ssh access to my virtual services. Then import already existed in GCE firewall rule into Terraform. Then, created IP as a resource, and used this ip in virtual machines. 
 
-Secondly, make terraform configuration for two designated VM's - one for database server, and another for application server. With packer, two new images are made, then modules for terraform are created (DB module, APP module, and VPC one for network configuration). Output and input variables are used for more flexibility. 
+Secondly, make terraform configuration for two designated VM's - one for the database server, and another for the application server. With packer, two new images are made, then modules for terraform are created (DB module, APP module, and VPC one for network configuration). Output and input variables are used for more flexibility. 
 
 The modules are then used for separate "stage" and "prod" configurations.
 
-Don't forget `terraform get`, `terraform fmt`, and `tree .terraform` (in orger to check the current structure). 
+Don't forget `terraform get`, `terraform fmt`, and `tree .terraform` (in order to check the current structure). 
 
-Finally, practise HashiCorp's  "registry": create backet with the help of [storage-bucket](https://registry.terraform.io/modules/SweetOps/storage-bucket/google).
+Finally, practice HashiCorp's  "registry": create backet with the help of [storage-bucket](https://registry.terraform.io/modules/SweetOps/storage-bucket/google).
 
 **1. Additional tasks with \*:**
 
-In backend.tf describe storaging of terraform "state" file. Use `prefix = prod` and  `prefix = stage` in order to store different state file in different folders within one backend.
+In backend.tf describe the storage of terraform "state" file. Use `prefix = prod` and  `prefix = stage` in order to store different state file in different folders within one backend.
 ```
 terraform {
   backend "gcs"
