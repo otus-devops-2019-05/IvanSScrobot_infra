@@ -1,0 +1,8 @@
+- name: Ntpd
+  hosts: all
+  become: yes
+  tasks:
+   # - yum: name=python2 state=present
+    - apt: name=ntp state=present
+    - service: name=ntpd state=started enabled=yes
+
