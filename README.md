@@ -501,4 +501,3 @@ Then, authorize and encrypt the password:
 travis login --com
 travis encrypt "devops-team-otus:<my_token>#<name_of_my_chanel>" --add notifications.slack.rooms --com
 ```
-
