@@ -1,8 +1,3 @@
-# locals {
-#db_ip = "${var.db_external_ip}"
-# db_ip = "${join(",",var.db_external_ip)}"
-#echo_db_url = "echo Environment='DATABASE_URL=${local.db_ip}:27017' >> '/tmp/puma.service' "
-# }
 
 data "template_file" "puma_file" {
   template = "${file("${path.module}/files/puma.service.tpl")}"
@@ -36,29 +31,29 @@ resource "google_compute_instance" "app" {
     ssh-keys = "appuser:${file(var.public_key_path)}"
   }
 
-  connection {
-    type        = "ssh"
-    user        = "ivan"
-    agent       = false
-    private_key = "${file(var.private_key_path)}"
-  }
+#  connection {
+#    type        = "ssh"
+#    user        = "ivan"
+#    agent       = false
+#    private_key = "${file(var.private_key_path)}"
+#  }
 
-  provisioner "file" {
-    content     = "${data.template_file.puma_file.rendered}"
-    destination = "/tmp/puma.service"
-  }
+#  provisioner "file" {
+#    content     = "${data.template_file.puma_file.rendered}"
+#    destination = "/tmp/puma.service"
+#  }
 
-  provisioner "file" {
-    source      = "${path.module}/files/deploy.sh"
-    destination = "/tmp/deploy.sh"
-  }
+#  provisioner "file" {
+#    source      = "${path.module}/files/deploy.sh"
+#    destination = "/tmp/deploy.sh"
+#  }
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo cp /tmp/puma.service /etc/systemd/system/puma.service",
-      "sudo bash /tmp/deploy.sh",
-    ]
-  }
+#  provisioner "remote-exec" {
+#    inline = [
+#      "sudo cp /tmp/puma.service /etc/systemd/system/puma.service",
+#      "sudo bash /tmp/deploy.sh",
+#    ]
+#  }
 }
 
 resource "google_compute_address" "app_ip" {

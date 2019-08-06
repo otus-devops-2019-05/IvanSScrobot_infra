@@ -1,5 +1,36 @@
 # IvanSScrobot_infra 
 
+## HW#9 Ansible. Practice #2.
+
+**0. Preparation:**
+
+Use template files for MongoDB config and ansible variables for IP addresses. Use handlers for dependent tasks - in our case, for restarting MongoDB when mongo's conf file is changed. 
+
+ - Create one file with one playbook for both app and db servers (reddit_app_one_play.yml). It's possible to work with such a playbook if we use tags for different services (like this: `ansible-playbook reddit_app.yml --limit db --tags deploy-tag`), but it's not so handy as we have to remember correspondence between tasks and tags.
+ - Create another file with several playbooks (one for MongoDB configuration, another for app configuration, and last for app deployment). One file with many playbooks seems to be more comfortable, but such file tends to grow rapidly in real life, making difficult to manage it.
+ - Create several files, with one playbook in each of them. Then, create 'main playbook', which runs others:
+ ```
+ ---
+- import_playbook: db.yml
+- import_playbook: app.yml
+- import_playbook: deploy.yml
+ ```
+
+**1. Independent task:**
+
+Replace bash scrypts for Packer with Ansible playbooks (files 'packer_app.yml' and 'packer_db.yml'). Find documentation for modules [here](https://docs.ansible.com/ansible/latest/modules/list_of_all_modules.html). Use [loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html), or this syntax:
+```
+  - name: Install ruby, bundler, and build
+    apt:
+      name: "{{ packages }}"
+      state: present
+  vars:
+    packages:
+      - ruby-full
+      - ruby-bundler
+      - build-essential
+``` 
+
 ## HW#8 Ansible. Practice #1.
 
 **0. Preparation:**
