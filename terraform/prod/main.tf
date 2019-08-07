@@ -1,5 +1,5 @@
 terraform {
-  #  required_version = "~>0.11.7"
+   required_version = "~>0.11.7"
 }
 
 provider "google" {
@@ -16,7 +16,7 @@ module "app" {
   project           = "${var.project}"
   private_key_path  = "${var.private_key_path}"
   app_instance_name = "${var.app_name}"
-  db_external_ip    = "${join(",",module.db.db_external_ip)}"
+#  db_external_ip    = "${join(",",module.db.db_external_ip)}"
 
   # "${module.db.db_external_ip}"
 }
@@ -32,7 +32,7 @@ module "db" {
 
 module "vpc" {
   source           = "../modules/vpc"
-  source_ranges    = ["46.8.36.5/32"]
+  source_ranges    = ["0.0.0.0/0"]
   public_key_path  = "${var.public_key_path}"
   project          = "${var.project}"
   private_key_path = "${var.private_key_path}"
