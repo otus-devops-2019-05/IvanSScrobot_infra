@@ -6,7 +6,7 @@
 
 ***Create roles***
 
-With `ansible-galaxy init `, create the folder structure for two roles, 'app' and 'db'. Basic structure is:
+With `ansible-galaxy init `, create the folder structure for two roles, 'app' and 'db'. The basic structure is:
 ```
 db
 ├── README.md
@@ -26,7 +26,7 @@ db
 └── vars # <-- Folder for variables, which should not be changed by users 
 └── main.yml 
 ```
-Then, copy tasks from playboks made during HW#9 to tasks in our roles. Do the same with handlers. Move templates and files into corresponding folders in roles. Define default variables in defaults/main.yml.
+Then, copy tasks from playbooks made during HW#9 to tasks in our roles. Do the same with handlers. Move templates and files into corresponding folders in roles. Define default variables in defaults/main.yml.
 Then, change playbooks app.yml and db.yml (delete tasks and handlers, add roles)
 
 ***Create environments***
@@ -38,7 +38,7 @@ for the environments - _stage_ and _prod_. Copy our inventory file into the fold
 inventory = ./environments/stage/inventory 
 ```
 
-Add files in directories _stage/group_vars/_ and _prod/group_vars/_ in order to manage group of hosts. Name files in directories after our groups defined in inventory (app, db, all), and add variables in these files. 
+Add files in directories _stage/group_vars/_ and _prod/group_vars/_ in order to manage groups of hosts. Name files in directories after our groups defined in inventory (app, db, all), and add variables in these files. 
 
 Organize files in the _ansible_ directory, tweak _ansible.cfg._
 
@@ -55,14 +55,14 @@ Then, install the role from Galaxy: `ansible-galaxy install -r environments/stag
 
 ***Ansible Vault***
 
-Write down an arbitory key string in vault.key, then in ansible.cfg refer to this file:
+Write down an arbitrary key string in vault.key, then in ansible.cfg refer to this file:
 ```
 [defaults]
 ...
 vault_password_file = vault.key
 ```
 
-Add playbook users.yml for creating users, in files _credentials.yml_ describe users in such way:
+Add playbook users.yml for creating users, in files _credentials.yml_ describe users in such a way:
 ```
 credentials:
   users:
