@@ -1,16 +1,89 @@
 # IvanSScrobot_infra 
 
+## HW#10 Ansible. Practice #3.
+
+**0. Preparation:**
+
+***Create roles***
+
+With `ansible-galaxy init `, create the folder structure for two roles, 'app' and 'db'. Basic structure is:
+```
+db
+├ README.md
+├ defaults # <-- Folder for default variables
+│ └ main.yml
+├ files #<-- Folder for files by default
+├ handlers
+│ └ main.yml
+├ meta # <-- General info about the role, dependencies, and the author
+│ └ main.yml
+├ tasks # <-- Folder for tasks
+│ └ main.yml
+├ tests
+│ ├ inventory
+│ └ test.yml
+| templates #<-- Folder for templates by default
+└ vars # <-- Folder for variables, which should not be changed by users 
+└ main.yml 
+```
+Then, copy tasks from playboks made during HW#9 to tasks in our roles. Do the same with handlers. Move templates and files into corresponding folders in roles. Define default variables in defaults/main.yml.
+Then, change playbooks app.yml and db.yml (delete tasks and handlers, add roles)
+
+***Create environments***
+
+In new folder _environments_, create two folders and name them 
+for the environments - _stage_ and _prod_. Copy our inventory file into the folders. Now, when running playbook.yml to configure the development infrastructure, we can pass in the path to a needed inventory: `ansible-playbook -i environments/prod/inventory deploy.yml`. In ansible.cfg, define inventory by default: 
+```
+[defaults]
+inventory = ./environments/stage/inventory 
+```
+
+Add files in directories _stage/group_vars/_ and _prod/group_vars/_ in order to manage group of hosts. Name files in directories after our groups defined in inventory (app, db, all), and add variables in these files. 
+
+Organize files in the _ansible_ directory, tweak _ansible.cfg._
+
+***Ansible Galaxy***
+
+In files _environments/stage/requirements.yml_ and _environments/prod/requirements.yml_ add this:
+```
+- src: jdauphant.nginx
+   version: v2.21.1
+```
+It enables us to use different dependacies in different environments.
+
+Then, install the role from Galaxy: `ansible-galaxy install -r environments/stage/requirements.yml`. Open port 80, and call `jdauphant.nginx` from app.yml.  See the [docs](https://github.com/jdauphant/ansible-role-nginx).
+
+***Ansible Vault***
+
+Write down an arbitory key string in vault.key, then in ansible.cfg refer to this file:
+```
+[defaults]
+...
+vault_password_file = vault.key
+```
+
+Add playbook users.yml for creating users, in files _credentials.yml_ describe users in such way:
+```
+credentials:
+  users:
+    admin:
+      password: admin123
+      groups: sudo
+```
+Encrypt _credentials.yml_ by running `ansible-vault encrypt environments/prod/credentials.yml`. For editing and decrypting, use following commands: `ansible-vault edit <file>`, `ansible-vault decrypt <file>`.
+
+
 ## HW#9 Ansible. Practice #2.
 
 **0. Preparation:**
 
-Use templates (forexample< for MongoDB config) and ansible variables for IP addresses. Use handlers for dependent tasks - in our case, for restarting MongoDB when mongo's conf file is changed. 
+Use templates (for MongoDB config file) and ansible variables for IP addresses. Use handlers for dependent tasks - in our case, for restarting MongoDB when mongo's conf file is changed.
 
- - Create one file with one playbook for both app and db servers (reddit_app_one_play.yml). It's possible to work with such a playbook if we use tags for different services (like this: `ansible-playbook reddit_app.yml --limit db --tags deploy-tag`), but it's not so handy as we have to remember correspondence between tasks and tags.
+- Create one file with one playbook for both app and db servers (reddit_app_one_play.yml). It's possible to work with such a playbook if we use tags for different services (like this: `ansible-playbook reddit_app.yml --limit db --tags deploy-tag`), but it's not so handy as we have to remember correspondence between tasks and tags.
 
- - Create another file with several playbooks (one for MongoDB configuration, another for app configuration, and last for app deployment). One file with many playbooks seems to be more comfortable, but such file tends to grow rapidly in real life, making difficult to manage it.
+- Create another file with several playbooks (one for MongoDB configuration, another for app configuration, and last for app deployment). One file with many playbooks seems to be more comfortable, but such files tend to grow rapidly in real life, making difficult to manage it.
 
- - Create several files, with one playbook in each of them. Then, create 'main playbook', which runs others:
+- Create several files, with one playbook in each of them. Then, create 'main playbook', which runs others:
 
 
 ```
