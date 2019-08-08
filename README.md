@@ -9,22 +9,22 @@
 With `ansible-galaxy init `, create the folder structure for two roles, 'app' and 'db'. Basic structure is:
 ```
 db
-├ README.md
-├ defaults # <-- Folder for default variables
-│ └ main.yml
-├ files #<-- Folder for files by default
-├ handlers
-│ └ main.yml
-├ meta # <-- General info about the role, dependencies, and the author
-│ └ main.yml
-├ tasks # <-- Folder for tasks
-│ └ main.yml
-├ tests
-│ ├ inventory
-│ └ test.yml
-| templates #<-- Folder for templates by default
-└ vars # <-- Folder for variables, which should not be changed by users 
-└ main.yml 
+├── README.md
+├── defaults # <-- Folder for default variables
+│ └── main.yml
+├── files #<-- Folder for files by default
+├── handlers
+│ └── main.yml
+├── meta # <-- General info about the role, dependencies, and the author
+│ └── main.yml
+├── tasks # <-- Folder for tasks
+│ └── main.yml
+├── tests
+│ ├── inventory
+│ └── test.yml
+|── templates #<-- Folder for templates by default
+└── vars # <-- Folder for variables, which should not be changed by users 
+└── main.yml 
 ```
 Then, copy tasks from playboks made during HW#9 to tasks in our roles. Do the same with handlers. Move templates and files into corresponding folders in roles. Define default variables in defaults/main.yml.
 Then, change playbooks app.yml and db.yml (delete tasks and handlers, add roles)
