@@ -8,3 +8,4 @@ variables.json
 *.retry
 *.backup
 jdauphant.nginx
+vault.key
