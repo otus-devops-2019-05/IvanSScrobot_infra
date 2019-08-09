@@ -6,3 +6,6 @@ variables.json
 *.tfvars
 .terraform/
 *.retry
+*.backup
+jdauphant.nginx
+vault.key
