@@ -5,4 +5,4 @@
     - ruby-full
     - ruby-bundler
     - build-essential
-  tags: ruby
+  tags: ruby_install
