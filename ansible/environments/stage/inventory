@@ -4,3 +4,5 @@ appserver ansible_host=35.240.4.206
 [db] 
 dbserver ansible_host=34.77.41.6
 
+[all]
+ansible_python_interpreter=/usr/bin/python2.7
