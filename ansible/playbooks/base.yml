@@ -1,0 +1,12 @@
+---
+- name: Check && install python
+  hosts: all
+  become: true
+  gather_facts: False
+  vars:
+    ansible_python_interpreter: "/usr/bin/python2.7"
+
+  tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      changed_when: False

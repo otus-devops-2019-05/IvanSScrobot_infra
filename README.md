@@ -1,5 +1,80 @@
 # IvanSScrobot_infra 
 
+## HW#11 Ansible. Practice #4.
+
+**0. Preparation:**
+
+Install VirtualBox and Vagrant, in the Vagrantfile describe my Vms, check it by running `vagrant up`. Then, `vagrant box list` shows VM images that vagrant downloaded to the host, and `vagrant status` show current machine states. By `vagrat ssh appserver` connect to the app VM.
+
+**1. Use ansible as a provisioner for vagrant**
+
+First, don't forget to install python-minimal (in base.yml).
+Then, add provisioners in Vagrantfile.
+```
+    db.vm.provision "ansible" do |ansible|
+      ansible.playbook = "playbooks/site.yml"
+      ansible.groups = {
+      "db" => ["dbserver"],
+      "db:vars" => {"mongo_bind_ip" => "0.0.0.0"}
+      }
+```
+Then, for 'db' role add new tasks (copy them from tasks for packer), and relocate the task for config mongo in a separate file, so that main.yml use all necessary tasks by ` -include: name_of_file.yml`. Do the same for 'app' role (move tasks ruby and puma in separate files).  
+Add `{{ deploy_user }}` instead of appuser in tasks and templates (where applicable), and define the user in Vagrantfile:
+```
+ansible.extra_vars = {
+ "deploy_user" => "vagrant"
+ }
+ ``` 
+
+Surprisingly, vagrant runs playbooks on Vms under user 'vagrant'.
+
+Finally, run `vagrant provision name_of_server`.
+
+**2. Additional tasks with \*:**
+Add the following code in Vagrantfile in order to configure nginx:
+```
+        "nginx_sites" => {
+          "default" => [
+            "listen 80",
+            "server_name 'reddit'",
+            "location / { proxy_pass http://127.0.0.1:9292; }"
+            ]
+          }
+```
+
+**3. Auto testing roles:**
+
+Install Molecule, Ansible, Testinfra by `pip`, running in Python's virtual environment. Create molecule's folder structure and templates:
+```
+molecule init scenario --scenario-name default -r db -d vagrant
+```
+In molecule/default/tests/test_default.py define tests. Our test VM is described in db/molecule/default/molecule.yml. `molecule create` create and run the test VM, check by running `molecule list` and `molecule login -h instance_name`. `molecule converge` apply the molecule's playbook (db/molecule/default/playbook.yml) to the test VM. `molecule verify` run tests against the VM. `molecule test` execute following steps:
+```
+└── default
+    ├── lint
+    ├── destroy
+    ├── dependency
+    ├── syntax
+    ├── create
+    ├── prepare
+    ├── converge
+    ├── idempotence
+    ├── side_effect
+    ├── verify
+    └── destroy
+```
+Also, write a test which listen to 27017 port, in packer *.json file use roles (instead of separate playbooks) and specify needed steps from the roles by using tags:
+```
+"provisioners": [
+        {
+            "type": "ansible",
+            "playbook_file": "ansible/playbooks/packer_db.yml",
+            "extra_arguments": [ "--tags", "mongo_install"],
+            "ansible_env_vars": ["ANSIBLE_ROLES_PATH=ansible/roles"]
+        }
+    ]
+```
+
 ## HW#10 Ansible. Practice #3.
 
 **0. Preparation:**

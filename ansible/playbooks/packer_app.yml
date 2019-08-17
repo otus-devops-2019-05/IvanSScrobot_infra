@@ -1,17 +1,6 @@
 - name: Install ruby and bundler
   hosts: all
   become: true
-  tasks:
-  - name: Update rep
-    apt:
-      update_cache: yes
-  - name: Install ruby, bundler, and build
-    apt:
-      name: "{{ packages }}"
-      state: present
-  vars:
-    packages:
-      - ruby-full
-      - ruby-bundler
-      - build-essential
-
+  
+  roles:
+    - app
